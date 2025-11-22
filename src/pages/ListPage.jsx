@@ -8,6 +8,7 @@ export default function ListPage() {
 
   const load = async () => {
     const snap = await getDocs(collection(db, "vehicle"));
+    console.log(snap,'snap')
     setPlates(snap.docs.map((d) => ({ plate: d.id, ...d.data() })));
   };
 

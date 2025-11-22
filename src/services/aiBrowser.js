@@ -1,14 +1,55 @@
 const CLOUD_NAME = import.meta.env.VITE_CLOUD_NAME || "dkv1zwjfe";
+import axios from "axios";
 
 /* ----------  fake LongCat – returns instantly  ---------- */
-export async function askLongCat(prompt) {
-  // mock replies
-  if (prompt.includes("leiekontrakt")) return "Leieavtalen ser standard ut. Ingen spesielle avvik.";
-  if (prompt.includes("dekkmønster"))  return "Dekkene har ca. 4 mm mønster – bytt om 5 000 km.";
-  if (prompt.includes("service"))      return "Anbefal service om 8 000 km / 6 måneder.";
-  if (prompt.includes("feil"))         return "1. Tidlig EGR-ventil problemer\n2. Svake fjærer bak\n3. Katalysator ved 150 000 km";
-  return "Ingen spesielle anbefalinger.";
-}
+// export async function askLongCat(prompt) {
+//   // mock replies
+//   if (prompt.includes("leiekontrakt")) return "Leieavtalen ser standard ut. Ingen spesielle avvik.";
+//   if (prompt.includes("dekkmønster"))  return "Dekkene har ca. 4 mm mønster – bytt om 5 000 km.";
+//   if (prompt.includes("service"))      return "Anbefal service om 8 000 km / 6 måneder.";
+//   if (prompt.includes("feil"))         return "1. Tidlig EGR-ventil problemer\n2. Svake fjærer bak\n3. Katalysator ved 150 000 km";
+//   return "Ingen spesielle anbefalinger.";
+// }
+
+
+
+
+
+
+
+
+export const askLongCat = async (prompt) => {
+  console.log(prompt,'prompt')
+  try {
+    const apiKey = import.meta.env.VITE_LONGCAT_API_KEY;
+    const url = "https://api.longcat.chat/openai/v1/chat/completions";
+
+    const body = {
+      model: "LongCat-Flash-Chat",
+      messages: [
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      max_tokens: 300
+    };
+
+    const headers = {
+      "Authorization": `Bearer ${apiKey}`,
+      "Content-Type": "application/json"
+    };
+
+    const resp = await axios.post(url, body, { headers });
+    console.log(resp.data.choices?.[0]?.message?.content)
+
+    return resp.data.choices?.[0]?.message?.content || "No response from AI.";
+  } catch (err) {
+    console.error("LongCat API error:", err.response?.data || err);
+    return "Kunne ikke hente svar fra LongCat.";
+  }
+};
+
 
 /* ----------  Cloudinary UNSIGNED (works locally)  ---------- */
 export async function uploadCloudinaryUnsigned(file, folder = "vehicle-app") {

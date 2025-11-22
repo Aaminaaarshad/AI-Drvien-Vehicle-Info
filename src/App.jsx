@@ -5,7 +5,7 @@ import Header from "./components/Header";
 import VehicleInfo from "./components/VehicleInfo";
 import ManualDataForm from "./components/ManualDataForm";
 import { db } from "./firebase";
-import { doc, getDoc, setDoc, enableNetwork } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 function App() {
   const [plate, setPlate] = useState("");
@@ -22,9 +22,23 @@ function App() {
       );
       console.log("Fetched vehicle data:", data);
       setVehicleData(data);
-      await enableNetwork(db);
-      const snap = await getDoc(doc(db, "manualVehicleData", plate));
-      setManualData(snap.exists() ? snap.data() : {});
+      const snap = await getDoc(doc(db, "vehicle", plate));
+
+const data1 = snap.exists() ? snap.data() : {};
+console.log("🔵 Manual data loaded from Firestore:", data1);
+
+    const snapData = snap.exists() ? snap.data() : {};
+    
+    // setManualData(snapData.manualData || {});
+    setManualData(prev => ({
+  ...prev,
+  ...snapData.manualData,      // Firestore manual data
+  maintenance: snapData.manualData?.maintenance || prev.maintenance,
+  lease: snapData.manualData?.lease || prev.lease,
+  insurance: snapData.manualData?.insurance || prev.insurance,
+  liens: snapData.manualData?.liens || prev.liens,
+}));
+
     } catch (err) {
       console.error(err);
       alert("Error fetching data – check console");
@@ -34,27 +48,28 @@ function App() {
   };
 
   /* ----------  NEW: save BOTH api + manual  ---------- */
-  const saveEverything = async () => {
-    if (!plate) {
-      alert("Enter a license plate first");
-      return;
-    }
-    try {
-      await enableNetwork(db);
-      const payload = {
-        plate,
-        apiData: vehicleData,
-        manualData,
-        savedAt: new Date().toISOString(),
-      };
-      // store in collection "vehicle", doc id = plate
-      await setDoc(doc(db, "vehicle", plate), payload);
-      alert("Vehicle + manual data saved");
-    } catch (err) {
-      console.error(err);
-      alert("Error saving everything");
-    }
-  };
+const saveEverything = async () => {
+  if (!plate) {
+    alert("Enter a license plate first");
+    return;
+  }
+  try {
+    const payload = {
+      plate,
+      apiData: vehicleData,
+      manualData,
+      savedAt: new Date().toISOString(),
+    };
+
+    await setDoc(doc(db, "vehicle", plate), payload);
+
+    alert("Vehicle + manual data saved");
+  } catch (err) {
+    console.error(err);
+    alert("Error saving everything");
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -91,9 +106,10 @@ function App() {
 
         {/* Content grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-4">
-            <VehicleInfo vehicleData={vehicleData} />
+         {vehicleData &&<div
+          className="lg:col-span-2 space-y-4">
             <ManualDataForm manualData={manualData} setManualData={setManualData} />
+            <VehicleInfo vehicleData={vehicleData} />
             <div className="mt-4 flex gap-2">
               <button className="button" onClick={saveEverything}>
                 Save everything
@@ -103,7 +119,7 @@ function App() {
                 Save manual only
               </button>
             </div>
-          </div>
+          </div> }
 
           {/* Sidebar */}
           <aside className="space-y-4">
