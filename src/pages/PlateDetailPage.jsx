@@ -5,11 +5,14 @@ import { db } from "../firebase";
 import VehicleInfo from "../components/VehicleInfo";
 import ManualDataForm from "../components/ManualDataForm";
 import useAI from "../hooks/useAI";
+
 export default function PlateDetailPage() {
   const { plate } = useParams();
   const nav = useNavigate();
   const [apiData, setApiData] = useState(null);
   const [manualData, setManualData] = useState({});
+  const [tireAnalysisData, setTireAnalysisData] = useState(null); // New state for tire analysis
+
   useAI(apiData, setManualData);
   
   /* ---------- load once ---------- */
@@ -20,16 +23,26 @@ export default function PlateDetailPage() {
         const d = snap.data();
         setApiData(d.apiData || null);
         setManualData(d.manualData || {});
+        // Initialize tireAnalysisData from manualData if it exists
+        if (d.manualData?.tireAnalysis) {
+            setTireAnalysisData(d.manualData.tireAnalysis);
+        }
       }
     })();
   }, [plate]);
 
   /* ---------- save edits ---------- */
   const saveEdit = async () => {
+    // Combine manualData with the latest tire analysis data
+    const dataToSave = {
+        ...manualData,
+        tireAnalysis: tireAnalysisData,
+    };
+
     await setDoc(doc(db, "vehicle", plate), {
       plate,
       apiData,
-      manualData,
+      manualData: dataToSave, // Save the combined data
       savedAt: new Date().toISOString(),
     });
     alert("Saved changes");
@@ -40,6 +53,17 @@ export default function PlateDetailPage() {
     if (!window.confirm(`Delete ${plate} permanently?`)) return;
     await deleteDoc(doc(db, "vehicle", plate));
     nav("/list"); // back to list
+  };
+
+  // Handler to receive analysis data from child component
+  const handleAnalysisComplete = (analysisResult) => {
+    setTireAnalysisData(analysisResult);
+  };
+
+  // Pass tireAnalysisData to ManualDataForm so it can initialize its state
+  const manualDataWithAnalysis = {
+    ...manualData,
+    tireAnalysis: tireAnalysisData,
   };
 
   return (
@@ -54,7 +78,12 @@ export default function PlateDetailPage() {
       </div>
 
       <VehicleInfo vehicleData={apiData} />
-      <ManualDataForm manualData={manualData} setManualData={setManualData} />
+      <ManualDataForm 
+        manualData={manualDataWithAnalysis} 
+        setManualData={setManualData} 
+        plate={plate}
+        onAnalysisComplete={handleAnalysisComplete} // Pass the handler
+      />
 
       <div className="mt-6">
         <Link to="/" className="button">New search</Link>
