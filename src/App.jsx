@@ -29,8 +29,8 @@ function App() {
     if (!plate) return;
     setLoading(true);
     try {
-const { data } = await axios.get(`/api/vegvesen/${plate}`);
-setVehicleData(data);
+      const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/analysis/carDetailsFromPlate?plate=${plate}`);
+      setVehicleData(data);
 
 
       const snap = await getDoc(doc(db, "vehicle", plate));
