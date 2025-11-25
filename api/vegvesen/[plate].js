@@ -4,10 +4,11 @@ export default async function handler(req, res) {
   const { plate } = req.query;
 
   try {
-    const url = `/api/vegvesen/${plate}`
-    
+    // Call Vegvesen API directly (not your own API)
+    const url = `https://ws.vegvesen.no/no/vegvesen/kjoretoy/kjoretoyoppslag/v1/kjennemerkeoppslag/kjoretoy/${plate}`;
+
     const response = await axios.get(url, {
-      validateStatus: () => true, // allow all status codes
+      validateStatus: () => true,
     });
 
     console.log("Vegvesen status:", response.status);
@@ -22,7 +23,6 @@ export default async function handler(req, res) {
     }
 
     res.status(200).json(response.data);
-
   } catch (error) {
     console.error("Request failed:", error);
     res.status(500).json({ error: "Server crashed contacting Vegvesen" });
