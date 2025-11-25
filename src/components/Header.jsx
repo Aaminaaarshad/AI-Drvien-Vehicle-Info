@@ -3,12 +3,16 @@ import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Header() {
-  const {t} = useTranslation('app');
+  const { t } = useTranslation("app");
+
   return (
-    <header className="bg-white shadow flex justify-around">
-      <div className="py-4 px-4 sm:px-6">
-        <h1 className="text-xl font-semibold text-gray-900">{t('vehDash')}</h1>
-      </div>
+    <header className="bg-white shadow flex justify-between items-center w-full px-4 sm:px-6">
+      {/* Left side */}
+      <h1 className="text-xl font-semibold text-gray-900 py-4">
+        {t("vehDash")}
+      </h1>
+
+      {/* Right side */}
       <LanguageSwitcher />
     </header>
   );

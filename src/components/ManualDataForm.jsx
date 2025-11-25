@@ -428,9 +428,11 @@ const MAINT_TYPES = [
     const alerts = []
     ;(manualData.maintenance || []).forEach((m) => {
       if (!m) return
+      console.log(m)
       const s = getDateStatus(m.lastDate)
-      if (s === "Expired") alerts.push({ text: t("overdue"), risk: 9 })
-      else if (s === "Expiring Soon") alerts.push({ text: t("expiringSoon"), risk: 6 })
+      console.log(s)
+      if (s === "Expired") alerts.push({ text: `${m.serviceType} ${t("overdue")}`, risk: 9 })
+      else if (s === "Expiring Soon") alerts.push({ text: `${m.serviceType} ${t("expiringSoon")}`, risk: 6 })
     })
     const insStatus = getDateStatus(manualData.insurance?.expiryDate)
     if (insStatus === "Expired") alerts.push({ text: t("expired"), risk: 10 })
@@ -442,6 +444,7 @@ const MAINT_TYPES = [
   }
 
   const alerts = computeAlerts()
+  console.log(alerts,'alerst')
 
   const nowMs = Date.now()
   const dateMsList = [

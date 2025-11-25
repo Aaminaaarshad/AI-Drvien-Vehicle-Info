@@ -132,17 +132,36 @@ function App() {
           <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
             {/* Search bar + Dropdown + nav */}
             <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {/* Input for new plate search */}
+            
+              {/* Input for typing new plate */}
               <input
-                className="input sm:col-span-2"
+                className="input"
                 placeholder="Enter license plate (e.g. EF24448)"
                 value={plate}
                 onChange={(e) => setPlate(e.target.value.toUpperCase())}
               />
+            
+              {/* Dropdown for saved vehicles */}
+              <select
+                id="plate-select"
+                value={plate || ""}
+                onChange={handlePlateChange}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg bg-white text-lg font-semibold focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Select a plate...</option>
+                {allPlates.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+            
+              {/* Buttons */}
               <div className="flex gap-2">
                 <button className="button" onClick={() => fetchData()}>
                   {loading ? "Loading…" : "Fetch Vehicle Data"}
                 </button>
+            
                 <button
                   className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
                   onClick={() => {
@@ -154,29 +173,14 @@ function App() {
                 >
                   Reset
                 </button>
+            
                 <Link to="/list" className="button bg-green-600 hover:bg-green-700">
                   See saved
                 </Link>
               </div>
+            
             </div>
 
-            {/* Dropdown for Saved Vehicles */}
-            <div className="mb-6 p-4 bg-white rounded-lg shadow-md border border-slate-200">
-              <label htmlFor="plate-select" className="block text-sm font-medium text-slate-700 mb-2">
-                Select Saved Vehicle
-              </label>
-              <select
-                id="plate-select"
-                value={plate || ''}
-                onChange={handlePlateChange}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg bg-white text-lg font-semibold focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Select a plate...</option>
-                {allPlates.map(p => (
-                  <option key={p} value={p}>{p}</option>
-                ))}
-              </select>
-            </div>
 
             {/* Content grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
