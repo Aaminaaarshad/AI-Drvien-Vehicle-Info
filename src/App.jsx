@@ -56,12 +56,10 @@ function App() {
     setLoading(true);
     try {
       // Fetch API data
-      const { data } = await axios.get(
-        `/api/vegvesen/ws/no/vegvesen/kjoretoy/kjoretoyoppslag/v1/kjennemerkeoppslag/kjoretoy/${currentPlate}`
-      );
+      const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/analysis/carDetailsFromPlate?plate=${currentPlate}`);
       setVehicleData(data);
 
-      // Fetch Firestore data
+
       const snap = await getDoc(doc(db, "vehicle", currentPlate));
       const snapData = snap.exists() ? snap.data() : {};
       
