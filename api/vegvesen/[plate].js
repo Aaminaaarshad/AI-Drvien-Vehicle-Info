@@ -4,9 +4,8 @@ export default async function handler(req, res) {
   const { plate } = req.query;
 
   try {
-    const url =
-      `https://www.vegvesen.no/ws/no/vegvesen/kjoretoy/kjoretoyoppslag/v1/kjennemerkeoppslag/kjoretoy/${plate}`;
-
+    const url = `/api/vegvesen/${plate}`
+    
     const response = await axios.get(url, {
       validateStatus: () => true, // allow all status codes
     });
