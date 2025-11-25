@@ -5,6 +5,7 @@ import App from "./App";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ListPage from "./pages/ListPage";
 import PlateDetailPage from "./pages/PlateDetailPage";
+import "./i18n";
 
 const router = createBrowserRouter([
   { path: "/", element: <App /> },

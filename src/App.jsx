@@ -1,17 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import Header from "./components/Header";
 import VehicleInfo from "./components/VehicleInfo";
 import ManualDataForm from "./components/ManualDataForm";
 import { db } from "./firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, getDocs } from "firebase/firestore";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./components/LanguageSwitcher";
 
 function App() {
+  const { t } = useTranslation('app');
+
   const [plate, setPlate] = useState("");
   const [vehicleData, setVehicleData] = useState(null);
   const [manualData, setManualData] = useState({});
   const [loading, setLoading] = useState(false);
+  const [savedPlates, setSavedPlates] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      const snap = await getDocs(collection(db, "vehicle"));
+      setSavedPlates(snap.docs.map((d) => d.id));
+    })();
+  }, []);
 
   const fetchData = async () => {
     if (!plate) return;
@@ -20,74 +32,93 @@ function App() {
       const { data } = await axios.get(
         `/api/vegvesen/ws/no/vegvesen/kjoretoy/kjoretoyoppslag/v1/kjennemerkeoppslag/kjoretoy/${plate}`
       );
-      console.log("Fetched vehicle data:", data);
       setVehicleData(data);
+
       const snap = await getDoc(doc(db, "vehicle", plate));
+      const snapData = snap.exists() ? snap.data() : {};
 
-const data1 = snap.exists() ? snap.data() : {};
-console.log("🔵 Manual data loaded from Firestore:", data1);
-
-    const snapData = snap.exists() ? snap.data() : {};
-    
-    // setManualData(snapData.manualData || {});
-    setManualData(prev => ({
-  ...prev,
-  ...snapData.manualData,      // Firestore manual data
-  maintenance: snapData.manualData?.maintenance || prev.maintenance,
-  lease: snapData.manualData?.lease || prev.lease,
-  insurance: snapData.manualData?.insurance || prev.insurance,
-  liens: snapData.manualData?.liens || prev.liens,
-}));
-
+      setManualData((prev) => ({
+        ...prev,
+        ...snapData.manualData,
+        maintenance: snapData.manualData?.maintenance || prev.maintenance,
+        lease: snapData.manualData?.lease || prev.lease,
+        insurance: snapData.manualData?.insurance || prev.insurance,
+        liens: snapData.manualData?.liens || prev.liens,
+      }));
     } catch (err) {
       console.error(err);
-      alert("Error fetching data – check console");
+      alert(t("error_fetch"));
     } finally {
       setLoading(false);
     }
   };
 
-  /* ----------  NEW: save BOTH api + manual  ---------- */
-const saveEverything = async () => {
-  if (!plate) {
-    alert("Enter a license plate first");
-    return;
-  }
-  try {
-    const payload = {
-      plate,
-      apiData: vehicleData,
-      manualData,
-      savedAt: new Date().toISOString(),
-    };
+  const saveEverything = async () => {
+    if (!plate) {
+      alert(t("enter_plate_first"));
+      return;
+    }
 
-    await setDoc(doc(db, "vehicle", plate), payload);
-
-    alert("Vehicle + manual data saved");
-  } catch (err) {
-    console.error(err);
-    alert("Error saving everything");
-  }
-};
-
+    try {
+      const payload = {
+        plate,
+        apiData: vehicleData,
+        manualData,
+        savedAt: new Date().toISOString()
+      };
+      await setDoc(doc(db, "vehicle", plate), payload);
+      alert(t("success_save"));
+    } catch (err) {
+      console.error(err);
+      alert(t("error_save"));
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
+      
+
 
       <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-        {/* Search bar + nav */}
-        <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <input
-            className="input sm:col-span-2"
-            placeholder="Enter license plate (e.g. EF24448)"
-            value={plate}
-            onChange={(e) => setPlate(e.target.value.toUpperCase())}
-          />
+
+        <div className="mb-6 grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
+
+          <div className="sm:col-span-2">
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              {t("license_plate_label")}
+            </label>
+            <input
+              className="input w-full"
+              placeholder={t("license_plate_placeholder")}
+              value={plate}
+              onChange={(e) => setPlate(e.target.value.toUpperCase())}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              {t("saved_vehicles_label")}
+            </label>
+            <select
+              className="input w-full"
+              value={plate}
+              onChange={(e) => setPlate(e.target.value)}
+            >
+              <option value="">{t("saved_vehicles_default")}</option>
+              {savedPlates.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="flex gap-2">
             <button className="button" onClick={fetchData}>
-              {loading ? "Loading…" : "Fetch Vehicle Data"}
+              {loading ? t("loading") : t("fetch_vehicle_button")}
             </button>
+
             <button
               className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
               onClick={() => {
@@ -96,63 +127,39 @@ const saveEverything = async () => {
                 setManualData({});
               }}
             >
-              Reset
+              {t("reset_button")}
             </button>
+
             <Link to="/list" className="button bg-green-600 hover:bg-green-700">
-              See saved
+              {t("see_saved_button")}
             </Link>
           </div>
+
         </div>
 
-        {/* Content grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-         {vehicleData &&<div
-          className="lg:col-span-2 space-y-4">
-            <ManualDataForm manualData={manualData} setManualData={setManualData} />
-            <VehicleInfo vehicleData={vehicleData} />
-            <div className="mt-4 flex gap-2">
-              <button className="button" onClick={saveEverything}>
-                Save everything
-              </button>
-              {/* still keep old manual-only button if you want */}
-              <button className="button bg-indigo-600 hover:bg-indigo-700" onClick={saveEverything}>
-                Save manual only
-              </button>
-            </div>
-          </div> }
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {vehicleData && (
+            <div className="lg:col-span-2 space-y-4">
+              <ManualDataForm manualData={manualData} setManualData={setManualData} />
+              <VehicleInfo vehicleData={vehicleData} />
 
-          {/* Sidebar */}
-          <aside className="space-y-4">
-            <div className="card">
-              <h3 className="font-semibold mb-2">Quick Links</h3>
-              <ul className="text-sm space-y-1 text-blue-600">
-                <li>
-                  <a href="https://www.vegvesen.no/en/vehicles/" target="_blank" rel="noreferrer">
-                    Vegvesen – Vehicle Info
-                  </a>
-                </li>
-                <li>
-                  <a href="https://www.brreg.no/en/registration-of-mortgages/" target="_blank" rel="noreferrer">
-                    Brreg – Liens
-                  </a>
-                </li>
-                <li>
-                  <a href="https://developer.if-insurance.com/" target="_blank" rel="noreferrer">
-                    IF Insurance – API Docs
-                  </a>
-                </li>
-              </ul>
-            </div>
+              <div className="mt-4 flex gap-2">
+                <button className="button" onClick={saveEverything}>
+                  {t("save_everything_button")}
+                </button>
 
-            <div className="card">
-              <h3 className="font-semibold mb-2">How-to</h3>
-              <p className="text-sm text-gray-600">
-                Enter a license plate, fetch official data, then fill in liens, lease, insurance
-                and maintenance manually. Everything is saved per plate in collection <code>vehicle</code>.
-              </p>
+                <button
+                  className="button bg-indigo-600 hover:bg-indigo-700"
+                  onClick={saveEverything}
+                >
+                  {t("save_manual_only_button")}
+                </button>
+              </div>
+
             </div>
-          </aside>
+          )}
         </div>
+
       </main>
     </div>
   );

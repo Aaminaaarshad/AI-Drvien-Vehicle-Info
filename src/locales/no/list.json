@@ -1,0 +1,8 @@
+{
+  "title": "Lagrede kjøretøy",
+  "empty_state": "Ingenting lagret enda.",
+  "brand_unknown": "Merke ukjent",
+  "delete_button": "Slett",
+  "delete_confirm": "Slett {{plate}}?",
+  "back_to_search": "← Tilbake til søk"
+}

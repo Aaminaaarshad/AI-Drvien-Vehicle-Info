@@ -21,68 +21,16 @@ import {
   Car,
   Gauge,
 } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 // --- Helper Data and Functions ---
 
 const DATE_FIELDS = ["start", "end", "paymentDate", "lastDate", "expiryDate"]
 
-const BLOCKS = [
-  {
-    title: "Liens / Mortgages",
-    key: "liens",
-    fields: [
-      { k: "provider", l: "Provider" },
-      { k: "amount", l: "Amount" },
-      { k: "status", l: "Status" },
-    ],
-  },
-  {
-    title: "Car Lease Info",
-    key: "lease",
-    fields: [
-      { k: "start", l: "Lease start" },
-      { k: "end", l: "Lease end" },
-      { k: "payment", l: "Lease payment" },
-      { k: "paymentDate", l: "Payment date" },
-      { k: "responsible", l: "Payment responsible" },
-      { k: "provider", l: "Lease provider" },
-      { k: "receiver", l: "Lease receiver" },
-      { k: "tender", l: "Relevant tender" },
-      { k: "webLinks", l: "Other web links" },
-    ],
-  },
-  {
-    title: "Insurance",
-    key: "insurance",
-    fields: [
-      { k: "provider", l: "Provider" },
-      { k: "claimContact", l: "Claim contact" },
-      { k: "claimProcedure", l: "Claim procedure URL" },
-      { k: "expiryDate", l: "Insurance Expiry Date" },
-    ],
-  },
-  {
-    title: "Maintenance",
-    key: "maintenance",
-    fields: [
-      { k: "serviceType", l: "Maintenance type" },
-      { k: "lastDate", l: "Last Service Date" },
-    ],
-  },
-]
 
-const MAINT_TYPES = [
-  "Oil change",
-  "Tyre change",
-  "Tyre inspection",
-  "Brake check",
-  "Battery check",
-  "Fluid check",
-  "Full service",
-  "Other",
-]
 
 const getDateStatus = (dateStr) => {
+  // const {t} = useTranslation('mdf');
   if (!dateStr) return null
   const today = new Date()
   const date = new Date(dateStr)
@@ -104,23 +52,25 @@ const formatDateShort = (d) => {
 // --- Helper Components for ResultsPage Integration ---
 
 const StatusBadge = ({ status }) => {
+
+  const {t} = useTranslation('mdf');
   if (!status || status === "Valid") {
     return (
       <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-        <CheckCircle size={14} /> Valid
+        <CheckCircle size={14} /> {t('status_valid')}
       </span>
     )
   }
   if (status === "Expired") {
     return (
       <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">
-        <AlertCircle size={14} /> Expired
+        <AlertCircle size={14} /> {t('status_expired')}
       </span>
     )
   }
   return (
     <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
-      <Clock size={14} /> Expiring Soon
+      <Clock size={14} /> {t('status_expiring_soon')}
     </span>
   )
 }
@@ -191,6 +141,7 @@ const getRiskLevelColor = (riskLevel) => {
 };
 
 const TireAnalysisResults = ({ analysis, onAnalyzeAgain }) => {
+  const {t} = useTranslation('mdf');
   if (!analysis) return null;
 
   const riskColor = getRiskLevelColor(analysis.riskLevel);
@@ -198,13 +149,13 @@ const TireAnalysisResults = ({ analysis, onAnalyzeAgain }) => {
   return (
     <div className="space-y-8 p-6 bg-white rounded-xl shadow-lg border border-slate-200">
       <h2 className="text-2xl font-bold text-slate-900 border-b pb-4 mb-4 flex items-center gap-2">
-        <Zap size={24} className="text-blue-600" /> Tire Analysis Results
+        <Zap size={24} className="text-blue-600" /> {t('tire_analysis_results_title')}
       </h2>
 
       {/* Condition Summary Card */}
       {analysis.condition && (
         <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-blue-500">
-          <h3 className="text-xl font-bold text-slate-900 mb-3">Condition Summary</h3>
+          <h3 className="text-xl font-bold text-slate-900 mb-3">{t('condition_summary_title')}</h3>
           <p className="text-base text-slate-700 leading-relaxed">{analysis.condition}</p>
         </div>
       )}
@@ -215,12 +166,12 @@ const TireAnalysisResults = ({ analysis, onAnalyzeAgain }) => {
           <div className="text-4xl">{riskColor.icon}</div>
           <div>
             <h3 className={`text-lg font-bold ${riskColor.text}`}>
-              Risk Level: {analysis.riskLevel.charAt(0).toUpperCase() + analysis.riskLevel.slice(1)}
+              {t('risk_level_title')}: {analysis.riskLevel.charAt(0).toUpperCase() + analysis.riskLevel.slice(1)}
             </h3>
             <p className={`text-sm ${riskColor.text} opacity-80 mt-1`}>
-              {analysis.riskLevel.toLowerCase() === "low" && "Your tires are in good condition with minimal risk."}
-              {analysis.riskLevel.toLowerCase() === "medium" && "Your tires need attention soon."}
-              {analysis.riskLevel.toLowerCase() === "high" && "Your tires require immediate attention."}
+              {analysis.riskLevel.toLowerCase() === "low" && t("risk_level_low_tip")}
+              {analysis.riskLevel.toLowerCase() === "medium" && t("risk_level_medium_tip")}
+              {analysis.riskLevel.toLowerCase() === "high" && t("risk_level_high_tip")}
             </p>
           </div>
         </div>
@@ -234,8 +185,8 @@ const TireAnalysisResults = ({ analysis, onAnalyzeAgain }) => {
               {analysis.estimatedLifeKm.toLocaleString()}
             </div>
             <div>
-              <h3 className="text-base font-semibold text-slate-900">Estimated Remaining Life (km)</h3>
-              <p className="text-sm text-slate-600 mt-1">Kilometers until replacement recommended</p>
+              <h3 className="text-base font-semibold text-slate-900">Estima{t("estimated_remaining_life_title")}</h3>
+              <p className="text-sm text-slate-600 mt-1">{t("kilometers_until_replacement")}</p>
             </div>
           </div>
         </div>
@@ -244,7 +195,7 @@ const TireAnalysisResults = ({ analysis, onAnalyzeAgain }) => {
       {/* Maintenance Tasks */}
       {analysis.maintenance && analysis.maintenance.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-xl font-bold text-slate-900">Maintenance Tasks</h3>
+          <h3 className="text-xl font-bold text-slate-900">{t("maintenance_tasks_title")}</h3>
           <div className="grid gap-4">
             {analysis.maintenance.map((task, idx) => {
               const priorityColor = getPriorityColor(task.priority);
@@ -273,7 +224,7 @@ const TireAnalysisResults = ({ analysis, onAnalyzeAgain }) => {
       {analysis.driverTips && analysis.driverTips.length > 0 && (
         <div className="p-6 rounded-xl text-white bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg">
           <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-            <span className="text-2xl">💡</span> Driver Tips
+            <span className="text-2xl">💡</span> {t("driver_tips_title")}
           </h3>
           <ul className="space-y-3 list-none p-0">
             {analysis.driverTips.map((tip, idx) => (
@@ -292,7 +243,7 @@ const TireAnalysisResults = ({ analysis, onAnalyzeAgain }) => {
           onClick={onAnalyzeAgain}
           className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-slate-100 text-slate-700 font-medium hover:bg-slate-200 transition-colors"
         >
-          <Zap size={18} /> Analyze Again
+          <Zap size={18} /> {t("analyze_again_button")}
         </button>
       </div>
     </div>
@@ -302,6 +253,7 @@ const TireAnalysisResults = ({ analysis, onAnalyzeAgain }) => {
 // --- Main Component ---
 
 export default function ManualDataForm({ manualData = {}, setManualData, plate = "", readOnly = false, onAnalysisComplete }) { // Added onAnalysisComplete prop
+  const {t} = useTranslation('mdf');
   const [workshops, setWorkshops] = useState([])
   const [leaseFile, setLeaseFile] = useState(null)
   const [leaseSummary, setLeaseSummary] = useState(manualData.lease?.docSummary || "")
@@ -312,6 +264,62 @@ export default function ManualDataForm({ manualData = {}, setManualData, plate =
   const [chatInput, setChatInput] = useState("")
   const [messages, setMessages] = useState([])
   const messagesEndRef = useRef(null)
+
+  const BLOCKS = [
+  {
+    title: t("liens_mortgages_title"),
+    key: "liens",
+    fields: [
+      { k: "provider", l: t("provider_label") },
+      { k: "amount", l: t("amount_label") },
+      { k: "status", l: t("status_label") },
+    ],
+  },
+  {
+    title: t("car_lease_info_title"),
+    key: "lease",
+    fields: [
+      { k: "start", l: t("lease_start_label") },
+      { k: "end", l: t("lease_end_label") },
+      { k: "payment", l: t("lease_payment_label") },
+      { k: "paymentDate", l: t("payment_date_label") },
+      { k: "responsible", l: t("payment_responsible_label") },
+      { k: "provider", l: t("lease_provider_label")},
+      { k: "receiver", l: t("lease_receiver_label")},
+      { k: "tender", l: t("relevant_tender_label") },
+      { k: "webLinks", l: t("other_web_links_label") },
+    ],
+  },
+  {
+    title: t("insurance_quick_view_title"),
+    key: "insurance",
+    fields: [
+      { k: "provider", l: t("lease_provider_label_short") },
+      { k: "claimContact", l: t("claim_contact_label") },
+      { k: "claimProcedure", l: t("claim_procedure_url_label") },
+      { k: "expiryDate", l: t("insurance_expiry_date_label") },
+    ],
+  },
+  {
+    title: t("maintenance_title"),
+    key: "maintenance",
+    fields: [
+      { k: "serviceType", l: t("maintenance_type_label") },
+      { k: "lastDate", l: t("last_service_date_label")},
+    ],
+  },
+]
+
+const MAINT_TYPES = [
+  t("maint_type_oil_change"),
+ t("maint_type_tyre_change"),
+  t("maint_type_tyre_inspection"),
+  t("maint_type_brake_check"),
+  t("maint_type_battery_check"),
+  t("maint_type_fluid_check"),
+  t("maint_type_full_service"),
+  t("maint_type_other"),
+]
 
   // New state for tire analysis, initialized from manualData for persistence
   const [tireAnalysis, setTireAnalysis] = useState(manualData.tireAnalysis?.analysis || null);
@@ -335,10 +343,10 @@ export default function ManualDataForm({ manualData = {}, setManualData, plate =
 
 
   const QUICK_QUESTIONS = [
-    { id: 1, text: "When will the insurance expire?", icon: "🛡️" },
-    { id: 2, text: "When will the lease expire?", icon: "📄" },
-    { id: 3, text: "When is the next maintenance due?", icon: "🔧" },
-    { id: 4, text: "What are the main alerts for this vehicle?", icon: "⚠️" },
+    { id: 1, text: t("whenInsuranceExpire"), icon: "🛡️" },
+    { id: 2, text: t("whenLeaseExpire"), icon: "📄" },
+    { id: 3, text:t("nextMaintenanceDue"), icon: "🔧" },
+    { id: 4, text: t("mainAlertsForVehicle"), icon: "⚠️" },
   ]
 
   const handleQuickQuestion = async (question) => {
@@ -355,18 +363,13 @@ export default function ManualDataForm({ manualData = {}, setManualData, plate =
         maintenance: manualData.maintenance || [],
         liens: manualData.liens || {},
       }
-      const prompt = `
-Du er en bilassistent. Bruk denne JSON-dataen og svar spørsmålet klart på norsk. 
-DATA: ${JSON.stringify(context, null, 2)}
-BRUKERS SPØRSMÅL: ${question}
-Svar 2-4 setninger, inkluder relevante fakta fra dataen når mulig og en kort AI-anbefaling.
-      `
+      const prompt = t("prompt")
       const answer = await askLongCat(prompt)
       const aiMsg = { from: "ai", text: answer, ts: Date.now() }
       setMessages((prev) => [...prev, aiMsg])
       setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 200)
     } catch (e) {
-      const errMsg = { from: "ai", text: "Beklager, noe gikk galt med AI-forespørselen." }
+      const errMsg = { from: "ai", text: t("aiError") }
       setMessages((prev) => [...prev, errMsg])
     }
     setChatInput("")
@@ -410,7 +413,7 @@ Svar 2-4 setninger, inkluder relevante fakta fra dataen når mulig og en kort AI
     try {
       const url = await uploadCloudinaryUnsigned(leaseFile, `lease/${plate}`)
       const txt = await fetch(url).then((r) => r.text())
-      const summary = await askLongCat(`Oppsummer følgende leiekontrakt på norsk i 5 setninger:\n${txt}`)
+      const summary = await askLongCat(t("longCat"))
       setLeaseSummary(summary)
       handleChange("lease", "docUrl", url)
       handleChange("lease", "docSummary", summary)
@@ -426,15 +429,15 @@ Svar 2-4 setninger, inkluder relevante fakta fra dataen når mulig og en kort AI
     ;(manualData.maintenance || []).forEach((m) => {
       if (!m) return
       const s = getDateStatus(m.lastDate)
-      if (s === "Expired") alerts.push({ text: `Maintenance "${m.serviceType}" is overdue`, risk: 9 })
-      else if (s === "Expiring Soon") alerts.push({ text: `Maintenance "${m.serviceType}" expiring soon`, risk: 6 })
+      if (s === "Expired") alerts.push({ text: t("overdue"), risk: 9 })
+      else if (s === "Expiring Soon") alerts.push({ text: t("expiringSoon"), risk: 6 })
     })
     const insStatus = getDateStatus(manualData.insurance?.expiryDate)
-    if (insStatus === "Expired") alerts.push({ text: "Insurance expired", risk: 10 })
-    else if (insStatus === "Expiring Soon") alerts.push({ text: "Insurance expiring soon", risk: 7 })
+    if (insStatus === "Expired") alerts.push({ text: t("expired"), risk: 10 })
+    else if (insStatus === "Expiring Soon") alerts.push({ text: t("expiringSoonTwo"), risk: 7 })
     const leaseStatus = getDateStatus(manualData.lease?.end)
-    if (leaseStatus === "Expired") alerts.push({ text: "Lease expired", risk: 8 })
-    else if (leaseStatus === "Expiring Soon") alerts.push({ text: "Lease expiring soon", risk: 5 })
+    if (leaseStatus === "Expired") alerts.push({ text: t("Lexpired"), risk: 8 })
+    else if (leaseStatus === "Expiring Soon") alerts.push({ text: t("LexpiringSoon"), risk: 5 })
     return alerts
   }
 
@@ -465,11 +468,7 @@ Svar 2-4 setninger, inkluder relevante fakta fra dataen når mulig og en kort AI
         liens: manualData.liens || {},
       }
 
-      const prompt = `
-Du er en bilassistent. Bruk denne JSON-dataen og gi en kort oppsummering av bilens status på norsk.
-Fokus på viktige datoer (utløp, forfall), vedlikeholdshistorikk og eventuelle alarmer.
-DATA: ${JSON.stringify(ctx, null, 2)}
-      `
+      const prompt = t("promptTwo")
       const summary = await askLongCat(prompt)
       setAiSummary(summary)
     } catch (e) {
@@ -545,7 +544,7 @@ DATA: ${JSON.stringify(ctx, null, 2)}
           {/* AI Summary Card */}
           <div className="bg-white rounded-xl shadow-md border border-slate-200 p-6 space-y-4">
             <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-              <Zap size={20} className="text-blue-600" /> AI Vehicle Summary
+              <Zap size={20} className="text-blue-600" /> {t("ai_vehicle_summary_title")}
             </h2>
             {loadingAi ? (
               <div className="flex justify-center items-center h-20">
@@ -558,7 +557,7 @@ DATA: ${JSON.stringify(ctx, null, 2)}
                 onClick={generateAiSummary}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors"
               >
-                Generate Summary
+                {t("generate_summary_button")}
               </button>
             )}
           </div>
@@ -566,7 +565,7 @@ DATA: ${JSON.stringify(ctx, null, 2)}
           {/* Alerts Card */}
           <div className="bg-white rounded-xl shadow-md border border-slate-200 p-6 space-y-4">
             <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-              <AlertCircle size={20} className="text-rose-500" /> Vehicle Alerts ({alerts.length})
+              <AlertCircle size={20} className="text-rose-500" /> {t("vehicle_alerts_title")}
             </h2>
             {alerts.length > 0 ? (
               <div className="space-y-3">
@@ -577,16 +576,16 @@ DATA: ${JSON.stringify(ctx, null, 2)}
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-slate-500">No critical alerts found.</p>
+              <p className="text-sm text-slate-500">{t("no_critical_alerts")}</p>
             )}
           </div>
 
           {/* Date Progress Bars */}
           <div className="bg-white rounded-xl shadow-md border border-slate-200 p-6 space-y-6">
-            <h2 className="text-lg font-semibold text-slate-900">Key Date Tracking</h2>
+            <h2 className="text-lg font-semibold text-slate-900">{t("key_date_tracking_title")}</h2>
             {manualData.insurance?.expiryDate && (
               <ProgressBar
-                label="Insurance Expiry"
+                label={t("insurance_expiry_label")}
                 dateMs={new Date(manualData.insurance.expiryDate).getTime()}
                 maxSpanMs={maxSpanMs}
                 colorClass="bg-green-500"
@@ -594,7 +593,7 @@ DATA: ${JSON.stringify(ctx, null, 2)}
             )}
             {manualData.lease?.end && (
               <ProgressBar
-                label="Lease End"
+                label={t('lease_end_label')}
                 dateMs={new Date(manualData.lease.end).getTime()}
                 maxSpanMs={maxSpanMs}
                 colorClass="bg-blue-500"
@@ -620,8 +619,8 @@ DATA: ${JSON.stringify(ctx, null, 2)}
                   <Shield size={22} className="text-green-700" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-900 text-lg">Insurance</h3>
-                  <p className="text-xs text-slate-600 mt-0.5">Coverage status</p>
+                  <h3 className="font-bold text-slate-900 text-lg">{t('insurance_title')}</h3>
+                  <p className="text-xs text-slate-600 mt-0.5">{t('insurance_coverage_status')}</p>
                 </div>
               </div>
               <div className="p-6">
@@ -629,7 +628,7 @@ DATA: ${JSON.stringify(ctx, null, 2)}
                   <div className="space-y-4">
                     {manualData.insurance.expiryDate && (
                       <div className="p-4 rounded-lg bg-green-50 border border-green-100">
-                        <p className="text-xs text-slate-600 uppercase font-bold tracking-wide mb-1">Expiry Date</p>
+                        <p className="text-xs text-slate-600 uppercase font-bold tracking-wide mb-1">{t('insurance_expiry_date_label_short')}</p>
                         <p className="text-sm text-slate-700 font-medium">
                           {formatDateShort(manualData.insurance.expiryDate)}
                         </p>
@@ -642,8 +641,8 @@ DATA: ${JSON.stringify(ctx, null, 2)}
                 ) : (
                   <div className="text-center py-8">
                     <Shield size={32} className="text-slate-300 mx-auto mb-3" />
-                    <p className="text-sm text-slate-500 font-medium">No insurance data</p>
-                    <p className="text-xs text-slate-400 mt-1">Add insurance information to track your coverage</p>
+                    <p className="text-sm text-slate-500 font-medium">{t('no_insurance_data')}</p>
+                    <p className="text-xs text-slate-400 mt-1">{t('add_insurance_info')}</p>
                   </div>
                 )}
               </div>
@@ -656,8 +655,8 @@ DATA: ${JSON.stringify(ctx, null, 2)}
                   <FileText size={22} className="text-blue-700" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-900 text-lg">Lease</h3>
-                  <p className="text-xs text-slate-600 mt-0.5">Lease agreement details</p>
+                  <h3 className="font-bold text-slate-900 text-lg">{t("lease_quick_view_title")}</h3>
+                  <p className="text-xs text-slate-600 mt-0.5">{t("lease_agreement_details")}</p>
                 </div>
               </div>
               <div className="p-6">
@@ -665,15 +664,15 @@ DATA: ${JSON.stringify(ctx, null, 2)}
                   <div className="space-y-4">
                     {manualData.lease.provider && (
                       <div className="p-4 rounded-lg bg-blue-50 border border-blue-100">
-                        <p className="text-xs text-slate-600 uppercase font-bold tracking-wide mb-1">Provider</p>
+                        <p className="text-xs text-slate-600 uppercase font-bold tracking-wide mb-1">{t('lease_provider_label_short')}</p>
                         <p className="text-lg font-bold text-slate-900">
-                          {manualData.lease.provider || "Not specified"}
+                          {manualData.lease.provider || t('not_specified')}
                         </p>
                       </div>
                     )}
                     {manualData.lease.end && (
                       <div className="p-4 rounded-lg bg-blue-50 border border-blue-100">
-                        <p className="text-xs text-slate-600 uppercase font-bold tracking-wide mb-1">End Date</p>
+                        <p className="text-xs text-slate-600 uppercase font-bold tracking-wide mb-1">{t('lease_end_date_label_short')}</p>
                         <p className="text-sm text-slate-700 font-medium">{formatDateShort(manualData.lease.end)}</p>
                       </div>
                     )}
@@ -684,8 +683,8 @@ DATA: ${JSON.stringify(ctx, null, 2)}
                 ) : (
                   <div className="text-center py-8">
                     <FileText size={32} className="text-slate-300 mx-auto mb-3" />
-                    <p className="text-sm text-slate-500 font-medium">No lease information</p>
-                    <p className="text-xs text-slate-400 mt-1">Add lease details to manage your agreement</p>
+                    <p className="text-sm text-slate-500 font-medium">{t('no_lease_information')}</p>
+                    <p className="text-xs text-slate-400 mt-1">{t("add_lease_details")}</p>
                   </div>
                 )}
               </div>
@@ -698,7 +697,7 @@ DATA: ${JSON.stringify(ctx, null, 2)}
           {/* Tire Analysis Section */}
           <div className="bg-white rounded-xl shadow-md border border-slate-200 p-6 space-y-4">
             <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-              <Wrench size={20} className="text-slate-600" /> Tire Maintenance Analysis
+              <Wrench size={20} className="text-slate-600" /> {t('tire_maintenance_analysis_title')}
             </h2>
             
             {/* Analysis Input Form (Hidden when results are present) */}
@@ -709,13 +708,13 @@ DATA: ${JSON.stringify(ctx, null, 2)}
                     <div className="space-y-2">
                         <label className="flex items-center text-sm font-semibold text-slate-700 mb-2">
                             <Car className="w-4 h-4 mr-2 text-blue-600" />
-                            Vehicle Type
+                            {t('vehicle_type_label')}
                         </label>
                         <input
                             type="text"
                             value={vehicleType}
                             onChange={(e) => setVehicleType(e.target.value)}
-                            placeholder="e.g. Honda Civic"
+                            placeholder={t('vehicle_type_placeholder')}
                             required
                             className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all duration-200 placeholder:text-slate-400"
                         />
@@ -724,13 +723,13 @@ DATA: ${JSON.stringify(ctx, null, 2)}
                     <div className="space-y-2">
                         <label className="flex items-center text-sm font-semibold text-slate-700 mb-2">
                             <Gauge className="w-4 h-4 mr-2 text-blue-600" />
-                            Mileage (km)
+                            {t('mileage_label')}
                         </label>
                         <input
                             type="number"
                             value={mileage}
                             onChange={(e) => setMileage(e.target.value)}
-                            placeholder="e.g. 45000"
+                            placeholder={t('mileage_placeholder')}
                             required
                             className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all duration-200 placeholder:text-slate-400"
                         />
@@ -739,7 +738,7 @@ DATA: ${JSON.stringify(ctx, null, 2)}
 
                 {/* Image Upload and Analyze Button */}
                 <div className="border-y border-slate-200 py-4 space-y-4">
-                  <label className="block text-sm font-medium text-slate-700">Upload Tire Pictures for Analysis</label>
+                  <label className="block text-sm font-medium text-slate-700">{t('upload_tire_images_label')}</label>
                   <input
                     type="file"
                     multiple
@@ -748,7 +747,7 @@ DATA: ${JSON.stringify(ctx, null, 2)}
                     className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm bg-white"
                   />
                   {tireImages.length > 0 && (
-                    <p className="text-xs text-slate-500">{tireImages.length} file(s) selected.</p>
+                    <p className="text-xs text-slate-500">{tireImages.length} {t('upload_tire_images_description')}</p>
                   )}
                   <button
                     onClick={runTireAnalysis}
@@ -761,11 +760,11 @@ DATA: ${JSON.stringify(ctx, null, 2)}
                   >
                     {isAnalyzing ? (
                       <>
-                        <Loader2 className="animate-spin" size={18} /> Analyzing...
+                        <Loader2 className="animate-spin" size={18} /> {t('analyzing_button')}
                       </>
                     ) : (
                       <>
-                        <Zap size={18} /> Run Tire Analysis
+                        <Zap size={18} /> {t("upload_button")}
                       </>
                     )}
                   </button>
@@ -778,7 +777,7 @@ DATA: ${JSON.stringify(ctx, null, 2)}
             
             {!tireAnalysis && !isAnalyzing && tireImages.length === 0 && (
                 <div className="text-center py-8 text-slate-500">
-                    <p>Upload pictures of your tires to start the analysis.</p>
+                    <p>{t('analyze_button')}</p>
                 </div>
             )}
           </div>
@@ -794,14 +793,14 @@ DATA: ${JSON.stringify(ctx, null, 2)}
                       <div key={i} className="flex gap-3 p-4 rounded-lg bg-slate-50 border border-slate-200">
                         <div className="flex-1 space-y-3">
                           <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Maintenance Type</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">{t('maintenance_type_label')}</label>
                             <select
                               className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                               value={item.serviceType || ""}
                               onChange={(e) => handleChange("maintenance", "serviceType", e.target.value, i)}
                               disabled={readOnly}
                             >
-                              <option value="">Select maintenance type</option>
+                              <option value="">{t('select_maintenance_type')}</option>
                               {MAINT_TYPES.map((t, j) => (
                                 <option key={j} value={t}>
                                   {t}
@@ -810,7 +809,7 @@ DATA: ${JSON.stringify(ctx, null, 2)}
                             </select>
                           </div>
                           <LabeledInput
-                            label="Last Service Date"
+                            label={t('last_service_date_label')}
                             type="date"
                             value={item.lastDate}
                             status={getDateStatus(item.lastDate)}
@@ -825,7 +824,7 @@ DATA: ${JSON.stringify(ctx, null, 2)}
                         onClick={addMaintenance}
                         className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors col-span-1 md:col-span-2"
                       >
-                        <Plus size={18} /> Add Maintenance
+                        <Plus size={18} /> {t('addMaintainance')}
                       </button>
                     )}
                   </>
@@ -861,7 +860,7 @@ DATA: ${JSON.stringify(ctx, null, 2)}
                       onClick={uploadLease}
                       className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors whitespace-nowrap"
                     >
-                      <Upload size={16} /> Upload Lease
+                      <Upload size={16} /> {t('uploadLease')}
                     </button>
                   </div>
                   {leaseSummary && (
@@ -883,13 +882,13 @@ DATA: ${JSON.stringify(ctx, null, 2)}
             onClick={() => setChatOpen(true)}
             className="flex items-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-blue-800 transition-all"
           >
-            💬 Ask AI
+            💬 {t('askAi')}
           </button>
         )}
         {chatOpen && (
           <div className="w-80 h-[500px] bg-white rounded-xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
             <div className="px-5 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white flex justify-between items-center">
-              <span className="font-semibold">Vehicle Assistant</span>
+              <span className="font-semibold">{t('vehicleAssistant')}</span>
               <button onClick={() => setChatOpen(false)} className="hover:bg-blue-600 p-1 rounded transition-colors">
                 <X size={20} />
               </button>
@@ -898,7 +897,7 @@ DATA: ${JSON.stringify(ctx, null, 2)}
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {messages.length === 0 && (
                 <div className="text-sm text-slate-500 text-center py-8">
-                  <p className="font-semibold mb-4">Ask about your vehicle</p>
+                  <p className="font-semibold mb-4">{t('askAboutYourVeh')}</p>
                   <div className="space-y-2">
                     {QUICK_QUESTIONS.map((q) => (
                       <button
@@ -935,7 +934,7 @@ DATA: ${JSON.stringify(ctx, null, 2)}
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleQuickQuestion(chatInput)}
-                placeholder="Type a message..."
+                placeholder={t('typeAMessage')}
                 className="flex-1 px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               />
               <button

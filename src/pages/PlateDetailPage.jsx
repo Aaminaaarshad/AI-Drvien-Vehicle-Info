@@ -11,7 +11,7 @@ export default function PlateDetailPage() {
   const nav = useNavigate();
   const [apiData, setApiData] = useState(null);
   const [manualData, setManualData] = useState({});
-  const [tireAnalysisData, setTireAnalysisData] = useState(null); // New state for tire analysis
+  const [tireAnalysisData, setTireAnalysisData] = useState(null); // Added for consistency with previous steps
 
   useAI(apiData, setManualData);
   

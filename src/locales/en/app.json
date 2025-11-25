@@ -1,0 +1,22 @@
+{
+  "license_plate_label": "License Plate",
+  "license_plate_placeholder": "Enter license plate (e.g. EF24448)",
+
+  "saved_vehicles_label": "Or pick saved",
+  "saved_vehicles_default": "-- Saved vehicles --",
+
+  "fetch_vehicle_button": "Fetch Vehicle Data",
+  "loading": "Loading…",
+
+  "reset_button": "Reset",
+  "see_saved_button": "See saved",
+
+  "save_everything_button": "Save everything",
+  "save_manual_only_button": "Save manual only",
+
+  "error_fetch": "Error fetching data – check console",
+  "error_save": "Error saving everything",
+  "success_save": "Vehicle + manual data saved",
+  "enter_plate_first": "Enter a license plate first",
+  "vehDash": "Vehicle Dashboard"
+}

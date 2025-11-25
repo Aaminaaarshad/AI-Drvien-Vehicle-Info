@@ -1,0 +1,22 @@
+{
+  "license_plate_label": "Registreringsnummer",
+  "license_plate_placeholder": "Skriv inn registreringsnummer (f.eks. EF24448)",
+
+  "saved_vehicles_label": "Eller velg lagret",
+  "saved_vehicles_default": "-- Lagrede kjøretøy --",
+
+  "fetch_vehicle_button": "Hent kjøretøydata",
+  "loading": "Laster…",
+
+  "reset_button": "Tilbakestill",
+  "see_saved_button": "Se lagrede",
+
+  "save_everything_button": "Lagre alt",
+  "save_manual_only_button": "Lagre kun manuelt",
+
+  "error_fetch": "Feil ved henting av data – sjekk konsoll",
+  "error_save": "Feil ved lagring av alt",
+  "success_save": "Kjøretøy + manuelle data lagret",
+  "enter_plate_first": "Skriv inn et registreringsnummer først",
+  "vehDash": "Kjøretøy-dashboard"
+}

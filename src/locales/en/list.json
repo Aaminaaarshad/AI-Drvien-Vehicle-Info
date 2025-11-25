@@ -1,0 +1,8 @@
+{
+  "title": "Saved vehicles",
+  "empty_state": "Nothing saved yet.",
+  "brand_unknown": "Brand unknown",
+  "delete_button": "Delete",
+  "delete_confirm": "Delete {{plate}}?",
+  "back_to_search": "← Back to search"
+}
