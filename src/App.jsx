@@ -29,10 +29,9 @@ function App() {
     if (!plate) return;
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `/api/vegvesen/ws/no/vegvesen/kjoretoy/kjoretoyoppslag/v1/kjennemerkeoppslag/kjoretoy/${plate}`
-      );
-      setVehicleData(data);
+const { data } = await axios.get(`/api/vegvesen/${plate}`);
+setVehicleData(data);
+
 
       const snap = await getDoc(doc(db, "vehicle", plate));
       const snapData = snap.exists() ? snap.data() : {};
