@@ -89,33 +89,39 @@ function App() {
   };
 
   /* ---------- save BOTH api + manual ---------- */
-  const saveEverything = async () => {
-    if (!plate) {
-      alert("Enter a license plate first");
-      return;
-    }
-    try {
-      // Combine manualData with the latest tire analysis data
-      const dataToSave = {
-        ...manualData,
-        tireAnalysis: tireAnalysisData, // Save the tire analysis data
-      };
+const cleanObject = (obj) => {
+  const cleaned = {};
+  for (let key in obj) {
+    cleaned[key] = obj[key] === undefined ? null : obj[key]; // 👈 Converts undefined → null
+  }
+  return cleaned;
+};
 
-      const payload = {
-        plate,
-        apiData: vehicleData,
-        manualData: dataToSave,
-        savedAt: new Date().toISOString(),
-      };
+const saveEverything = async () => {
+  if (!plate) return alert("Enter a license plate first");
 
-      await setDoc(doc(db, "vehicle", plate), payload);
+  try {
+    const dataToSave = cleanObject({
+      ...manualData,
+      tireAnalysis: tireAnalysisData
+    });
 
-      alert("Vehicle + manual data saved");
-    } catch (err) {
-      console.error(err);
-      alert("Error saving everything");
-    }
-  };
+    const payload = {
+      plate,
+      apiData: vehicleData,
+      manualData: dataToSave,
+      savedAt: new Date().toISOString(),
+    };
+
+    await setDoc(doc(db, "vehicle", plate), payload);
+
+    alert("Vehicle + manual data saved");
+  } catch(err) {
+    console.error(err);
+    alert("Error saving everything");
+  }
+};
+
 
   // Prepare manualData for ManualDataForm, including tire analysis
   const manualDataWithAnalysis = {
