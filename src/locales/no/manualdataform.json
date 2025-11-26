@@ -123,5 +123,5 @@
     "expiringSoonTwo": "Forsikringen utløper snart.",
      "Lexpired": "Leiekontrakten er utløpt.",
     "LexpiringSoon": "Leiekontrakten utløper snart.",
-    "promptTwo": "Du er en bilassistent. Bruk denne JSON-dataen og gi en kort oppsummering av bilens status på norsk.\nFokus på viktige datoer (utløp, forfall), vedlikeholdshistorikk og eventuelle alarmer.\nDATA: ${JSON.stringify(ctx, null, 2)}"
+    "promptTwo": "Du er en bilassistent. Bruk disse JSON-dataene til å generere et kort sammendrag i ett avsnitt om bilens nåværende status på norsk. Fokuser på viktige datoer som utløpsdatoer og kommende frister, nylig vedlikeholdshistorikk og eventuelle varsler eller advarsler. DATA: ${JSON.stringify(ctx, null, 2)} Svar i 3–5 setninger, og inkluder relevante fakta fra dataene når det er mulig."
 }

@@ -122,5 +122,5 @@
     "expiringSoonTwo": "Insurance expiring soon.",
     "Lexpired": "Lease expired.",
     "LexpiringSoon": "Lease expiring soon.",
-    "promptTwo": "You are a car assistant. Use this JSON data and give a brief summary of the car's status in English.\nFocus on key dates (expiry, due), maintenance history and any alerts.\nDATA: ${JSON.stringify(ctx, null, 2)}"
+    "promptTwo": "You are a car assistant. Use this JSON data to generate a brief, single-paragraph summary of the car's current status in English. Focus on key dates such as expiry and upcoming due dates, recent maintenance history, and any alerts or warnings. DATA: ${JSON.stringify(ctx, null, 2)}\nReply in 3–5 sentences, including relevant facts from the data when possible."
 }
