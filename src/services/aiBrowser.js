@@ -18,8 +18,28 @@ import axios from "axios";
 
 
 
-export const askLongCat = async (prompt) => {
-  console.log(prompt,'prompt')
+export const askLongCat = async (prompt, context = null) => {
+  // Accepts a prompt (the user's question or instruction) and an optional
+  // context object containing vehicle data. We combine these into a single
+  // message that will be sent to LongCat so the AI can provide context-aware answers.
+  let finalPrompt = prompt
+  if (context && typeof context === "object") {
+    try {
+      const ctxLines = []
+      if (context.plate) ctxLines.push(`Plate: ${context.plate}`)
+      if (context.lease && Object.keys(context.lease || {}).length) ctxLines.push(`Lease: ${JSON.stringify(context.lease)}`)
+      if (context.insurance && Object.keys(context.insurance || {}).length) ctxLines.push(`Insurance: ${JSON.stringify(context.insurance)}`)
+      if (context.maintenance && Array.isArray(context.maintenance) && context.maintenance.length) ctxLines.push(`Maintenance: ${JSON.stringify(context.maintenance)}`)
+      if (context.liens && Object.keys(context.liens || {}).length) ctxLines.push(`Liens: ${JSON.stringify(context.liens)}`)
+
+      const ctxStr = ctxLines.length ? `Context:\n${ctxLines.join('\n')}` : ""
+      finalPrompt = ctxStr ? `${ctxStr}\n\nUser request:\n${prompt}` : prompt
+    } catch (e) {
+      console.warn("Failed to stringify context for LongCat prompt", e)
+      finalPrompt = `${prompt}`
+    }
+  }
+  console.log(finalPrompt, 'prompt')
   try {
     const apiKey = import.meta.env.VITE_LONGCAT_API_KEY;
     const url = "https://api.longcat.chat/openai/v1/chat/completions";
@@ -29,7 +49,7 @@ export const askLongCat = async (prompt) => {
       messages: [
         {
           role: "user",
-          content: prompt
+          content: finalPrompt
         }
       ],
       max_tokens: 300

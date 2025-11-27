@@ -363,8 +363,9 @@ const MAINT_TYPES = [
         maintenance: manualData.maintenance || [],
         liens: manualData.liens || {},
       }
-      const prompt = t("prompt")
-      const answer = await askLongCat(prompt)
+      // build localized instruction + the user's specific question
+      const userPrompt = `${t("prompt")}\n\nQuestion: ${question}`
+      const answer = await askLongCat(userPrompt, context)
       const aiMsg = { from: "ai", text: answer, ts: Date.now() }
       setMessages((prev) => [...prev, aiMsg])
       setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 200)
@@ -413,7 +414,9 @@ const MAINT_TYPES = [
     try {
       const url = await uploadCloudinaryUnsigned(leaseFile, `lease/${plate}`)
       const txt = await fetch(url).then((r) => r.text())
-      const summary = await askLongCat(t("longCat"))
+      // include the loaded text as context — pass both the instruction and doc for better results
+      const prompt = t("longCat")
+      const summary = await askLongCat(prompt, { plate, lease: { ...manualData.lease, rawText: txt } })
       setLeaseSummary(summary)
       handleChange("lease", "docUrl", url)
       handleChange("lease", "docSummary", summary)
@@ -472,7 +475,7 @@ const MAINT_TYPES = [
       }
 
       const prompt = t("promptTwo")
-      const summary = await askLongCat(prompt)
+      const summary = await askLongCat(prompt, ctx)
       setAiSummary(summary)
     } catch (e) {
       console.error(e)
