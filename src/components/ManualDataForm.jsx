@@ -185,7 +185,7 @@ const TireAnalysisResults = ({ analysis, onAnalyzeAgain }) => {
               {analysis.estimatedLifeKm.toLocaleString()}
             </div>
             <div>
-              <h3 className="text-base font-semibold text-slate-900">Estima{t("estimated_remaining_life_title")}</h3>
+              <h3 className="text-base font-semibold text-slate-900">{t("estimated_remaining_life_title")}</h3>
               <p className="text-sm text-slate-600 mt-1">{t("kilometers_until_replacement")}</p>
             </div>
           </div>
